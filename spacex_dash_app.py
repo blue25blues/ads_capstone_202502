@@ -81,23 +81,25 @@ def get_pie_chart(entered_site):
             filtered_df,
             values='counts',
             names='class',
-            title='Total Success Launches for site ' + entered_site) 
+            title='Total Success/Failure Launches Rate for site ' + entered_site) 
         return fig
 
 # TASK 4:
 # Add a callback function for `site-dropdown` and `payload-slider` as inputs, `success-payload-scatter-chart` as output
 @app.callback(Output(component_id='success-payload-scatter-chart', component_property='figure'),
             [Input(component_id='site-dropdown', component_property='value'), 
-            Input(component_id="payload-slider", component_property="value")])
+            Input(component_id='payload-slider', component_property='value')])
 
 def get_scatter_plot(entered_site, slider_payload):
     #filtered_df = spacex_df.groupby()
+    range_low, range_high = slider_payload
     if entered_site == 'ALL':
-        fig = px.scatter(spacex_df, x='Payload Mass (kg)', y="class", color="Booster Version Category")
+        filtered_df = spacex_df[(spacex_df['Payload Mass (kg)'] > range_low) & (spacex_df['Payload Mass (kg)'] <= range_high)]
+        fig = px.scatter(filtered_df, x='Payload Mass (kg)', y="class", color="Booster Version Category", symbol="Booster Version Category")
         return fig
     else:
-        filtered_df = spacex_df[spacex_df['Launch Site'] == entered_site]
-        fig = px.scatter(filtered_df, x='Payload Mass (kg)', y="class", color="Booster Version Category")
+        filtered_df = spacex_df[(spacex_df['Launch Site'] == entered_site) & (spacex_df['Payload Mass (kg)'] > range_low) & (spacex_df['Payload Mass (kg)'] <= range_high)]
+        fig = px.scatter(filtered_df, x='Payload Mass (kg)', y="class", color="Booster Version Category", symbol="Booster Version Category")
         return fig
 
 # Run the app
